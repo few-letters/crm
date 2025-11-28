@@ -2,3 +2,4 @@
 profile = "django"
 preserve_blank_lines = true
 max_blank_lines = 2
+ignore = "H030,H031"
