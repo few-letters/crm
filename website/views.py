@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.contrib.messages import constants as messages
 
 
 def home(request):
@@ -25,3 +24,7 @@ def logout_user(request):
     logout(request)
     messages.success(request, "You have been loged out.")
     return redirect('home')
+
+
+def register_user(request):
+     return render(request, 'website/register.html', {})

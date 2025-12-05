@@ -1,6 +1,6 @@
 from pathlib import Path
 import environ
-from django.contrib.messages import constants as messages
+from django.contrib.messages import constants as message_constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,11 +21,11 @@ ALLOWED_HOSTS = []
 
 #Tags for messages
 MESSAGE_TAGS = {
-    messages.DEBUG: "secondary",
-    messages.INFO: "info",
-    messages.SUCCESS: "success",
-    messages.WARNING: "warning",
-    messages.ERROR: "danger",  # error -> Bootstrap "danger"
+    message_constants.DEBUG: "secondary",
+    message_constants.INFO: "info",
+    message_constants.SUCCESS: "success",
+    message_constants.WARNING: "warning",
+    message_constants.ERROR: "danger",  # error -> Bootstrap "danger"
 }
 
 # Application definition
