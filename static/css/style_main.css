@@ -1,6 +1,28 @@
 :root {
-  --bs-primary: #0d6efd;
-  --bs-secondary: #6c757d;
-  --bs-dark: #212529;
+  --bs-primary: #0d6efd; /*#0d6efd;*/
+  --bs-secondary: #6c757d; /*#6c757d;*/
+  --bs-dark: #212529; /*#212529;*/
   /* --my-grey: #4b5563; */
+}
+
+body {
+  background-color: #f3f8fd;
+}
+
+/* Button */
+.btn-outline-success {
+  --bs-btn-color: #0f766e; /* text color (normal) */
+  --bs-btn-border-color: #0f766e; /* border color (normal) */
+  --bs-btn-hover-bg: #0f766e; /* background on hover */
+  --bs-btn-hover-border-color: #0f766e; /* border on hover */
+  --bs-btn-active-bg: #0f766e; /* background on active/focus */
+  --bs-btn-active-border-color: #0f766e; /* border on active/focus */
+  --bs-btn-disabled-color: #0f766e; /* text when disabled */
+  --bs-btn-disabled-border-color: #0f766e; /* border when disabled */
+}
+
+/* navbar */
+.navbar.custom-bg-body-grey-1 {
+  --bs-bg-opacity: 1;
+  background-color: #d2e3f0;
 }
