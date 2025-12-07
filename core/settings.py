@@ -9,10 +9,10 @@ env = environ.Env(
     DEBUG=(bool, False),
     TIME_ZONE=(str, "UTC"),
 )
-environ.Env.read_env(BASE_DIR / ".env")
+environ.Env.read_env(BASE_DIR / '.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -21,11 +21,11 @@ ALLOWED_HOSTS = []
 
 #Tags for messages
 MESSAGE_TAGS = {
-    message_constants.DEBUG: "secondary",
-    message_constants.INFO: "info",
-    message_constants.SUCCESS: "success",
-    message_constants.WARNING: "warning",
-    message_constants.ERROR: "danger",  # error -> Bootstrap "danger"
+    message_constants.DEBUG: 'secondary',
+    message_constants.INFO: 'info',
+    message_constants.SUCCESS: 'success',
+    message_constants.WARNING: 'warning',
+    message_constants.ERROR: 'danger',  # error -> Bootstrap 'danger'
 }
 
 # Application definition
@@ -74,17 +74,17 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("DB_NAME"),
-        "USER": env("DB_USER"),
-        "PASSWORD": env("DB_PASSWORD"),
-        "HOST": env("DB_HOST"),
-        "PORT": env("DB_PORT"),
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT'),
     }
 }
 
-AUTH_USER_MODEL = "website.User"
+AUTH_USER_MODEL = 'website.User'
 
 
 # Password validation
@@ -111,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = env("TIME_ZONE")
+TIME_ZONE = env('TIME_ZONE')
 
 
 USE_I18N = True
@@ -125,7 +125,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # тобто CRM/static
+    BASE_DIR / 'static',  # тобто CRM/static
 ]
 
 # Default primary key field type

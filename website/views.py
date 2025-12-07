@@ -10,10 +10,10 @@ def home(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                  login(request, user)
-                 messages.success(request, "Login successful!")
+                 messages.success(request, 'Login successful!')
                  return redirect('home')
             else:
-                 messages.error(request, "Something went wrong, try again.")
+                 messages.error(request, 'Something went wrong, try again.')
                  return redirect('home')
 
     else:
@@ -22,7 +22,7 @@ def home(request):
 
 def logout_user(request):
     logout(request)
-    messages.success(request, "You have been loged out.")
+    messages.success(request, 'You have been loged out.')
     return redirect('home')
 
 
