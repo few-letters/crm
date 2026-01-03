@@ -7,50 +7,25 @@ User = get_user_model()
 class SignUpForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
-        # specify which fields of model will be used in form
         fields = ("username", "first_name", "last_name", "email", "password1", "password2")
-
-        # to render fields in HTML
         widgets = {
-            "username": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "User name",
-            }),
-            "first_name": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "First name",
-            }),
-            "last_name": forms.TextInput(attrs={
-                "class": "form-control",
-                "placeholder": "Last name",
-            }),
-            "email": forms.EmailInput(attrs={
-                "class": "form-control",
-                "placeholder": "Email address",
-            }),
-            "password1": forms.PasswordInput(attrs={
-                "class": "form-control",
-                "placeholder": "Password",
-            }),
-            "password2": forms.PasswordInput(attrs={
-                "class": "form-control",
-                "placeholder": "Confirm password",
-            }),
+            "username": forms.TextInput(attrs={"placeholder": "User name"}),
+            "first_name": forms.TextInput(attrs={"placeholder": "First name"}),
+            "last_name": forms.TextInput(attrs={"placeholder": "Last name"}),
+            "email": forms.EmailInput(attrs={"placeholder": "Email address"}),
+            "password1": forms.PasswordInput(attrs={"placeholder": "Password"}),
+            "password2": forms.PasswordInput(attrs={"placeholder": "Confirm password"}),
         }
 
-        # get rid of labels
-        labels = {
-            "username": "",
-            "first_name": "",
-            "last_name": "",
-            "email": "",
-            "password1": "",
-            "password2": "",
-        }
+        labels = {field: "" for field in fields}
 
-        # if help_text is needed
         help_texts = {
-            "username": "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
-            "password1": "Your password must contain at least 8 characters and not be too common.",
-            "password2": "Enter the same password as before, for verification.",
+            "username": "Letters, digits and @/./+/-/_ only.",
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Один цикл замість десятка однакових рядків
+        for field in self.fields.values():
+            field.widget.attrs.setdefault("class", "form-control")
