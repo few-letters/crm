@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.utils.html import format_html
+
 
 User = get_user_model()
 
@@ -20,7 +22,7 @@ class SignUpForm(UserCreationForm):
         labels = {field: "" for field in fields}
 
         help_texts = {
-            "username": "Letters, digits and @/./+/-/_ only.",
+            "username": format_html("<span class='ms-1'>Letters, digits and @/./+/-/_ only.</span>"),
         }
 
     def __init__(self, *args, **kwargs):
