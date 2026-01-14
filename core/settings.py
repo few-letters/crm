@@ -52,7 +52,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
-TEMPLATES = [
+#for @login_required
+LOGIN_URL = 'website:home'
+
+TEMPLATES = [ 
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],

@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg custom-bg-body-grey-1">
   <div class="container-fluid">
-    <a class="navbar-brand" href="{% url "home" %}">Navbar</a>
+    <a class="navbar-brand" href="{% url "website:home" %}">CRM</a>
 
     <button class="navbar-toggler"
             type="button"
@@ -15,10 +15,12 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active"
+             aria-current="page"
+             href="{% url "website:home" %}">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
+          <a class="nav-link" href="{% url "website:add_record" %}">Add record</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle"
@@ -52,12 +54,12 @@
       </form>
 
       {% if user.is_authenticated %}
-        <a href="{% url 'logout' %}"
+        <a href="{% url 'website:logout' %}"
            class="btn btn-outline-primary ms-0 ms-lg-2 mt-2 mt-md-0">Logout</a>
       {% else %}
-        <a href="{% url 'home' %}"
+        <a href="{% url 'website:home' %}"
            class="btn btn-outline-primary ms-0 ms-lg-2 mt-2 mt-md-0">Login</a>
-        <a href="{% url 'register' %}"
+        <a href="{% url 'website:register' %}"
            class="btn btn-outline-primary ms-0 ms-lg-2 mt-2 mt-md-0">Register</a>
       {% endif %}
     </div>

@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.utils.html import format_html
+from .models import Record
 
 
 User = get_user_model()
@@ -31,3 +32,19 @@ class SignUpForm(UserCreationForm):
         # Один цикл замість десятка однакових рядків
         for field in self.fields.values():
             field.widget.attrs.setdefault("class", "form-control")
+
+
+class AddRecordForm(forms.ModelForm):
+    class Meta:
+            model = Record
+
+            fields = ("first_name", "last_name", "email", "phone", "state", "city")
+
+            widgets = {
+            "first_name": forms.TextInput(attrs={"placeholder": "First name", "class": "form-control"}),
+            "last_name": forms.TextInput(attrs={"placeholder": "Last name", "class": "form-control"}),
+            "email": forms.EmailInput(attrs={"placeholder": "Email address", "class": "form-control"}),
+            "phone": forms.TextInput(attrs={"placeholder": "Phone", "class": "form-control"}),
+            "state": forms.TextInput(attrs={"placeholder": "State", "class": "form-control"}),
+            "city": forms.TextInput(attrs={"placeholder": "City", "class": "form-control"}),
+        }

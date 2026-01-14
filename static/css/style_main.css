@@ -27,6 +27,14 @@ body {
   background-color: #d2e3f0;
 }
 
+.bg-light-blue {
+  background-color: #deecfa;
+}
+
+.border-radius-14 {
+  border-radius: 14px;
+}
+
 /* registration form text */
 /* .registration_form .helptext {
   
