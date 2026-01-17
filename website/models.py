@@ -7,8 +7,16 @@ class User(AbstractUser):
 
     pass
 
-class Record(models.Model):
+
+class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class Customer(TimeStampedModel):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     phone = models.CharField(max_length=15, unique=True)
@@ -19,3 +27,4 @@ class Record(models.Model):
 
     def __str__(self):
         return(f"{self.first_name} {self.last_name}, email: {self.email}")
+

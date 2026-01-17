@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, AddRecordForm
-from .models import Record
+from .forms import SignUpForm, AddCustomerForm
+from .models import Customer
 from core.decorators import login_required_w_message
 
 
 def home(request):
-    records = Record.objects.all().order_by('pk')
+    customers = Customer.objects.all().order_by('pk')
 
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -22,7 +22,7 @@ def home(request):
                 return redirect('website:home')
 
     else:
-        return render(request, 'website/home.html', {'records': records})
+        return render(request, 'website/home.html', {'customers': customers})
 
 
 def logout_user(request):
@@ -50,45 +50,45 @@ def register_user(request):
     return render(request, 'website/register.html', {'form': form})
 
 @login_required_w_message()
-def customer_record(request, pk):
-    customer_record = Record.objects.get(id=pk)
-    return render(request, 'website/record.html', {'customer_record': customer_record})
+def customer_detail(request, pk):
+    customer = Customer.objects.get(id=pk)
+    return render(request, 'website/customer_detail.html', {'customer': customer})
 
 @login_required_w_message()
-def delete_record(request, pk):
-    record_to_delete = Record.objects.get(id=pk)
-    record_to_delete.delete()
-    messages.success(request, 'Record deleted successfully')
+def delete_customer(request, pk):
+    customer_to_delete = Customer.objects.get(id=pk)
+    customer_to_delete.delete()
+    messages.success(request, 'Customer deleted successfully')
     return redirect('website:home')
 
 @login_required_w_message()
-def add_record(request):
-    form = AddRecordForm(request.POST or None)
+def add_customer(request):
+    form = AddCustomerForm(request.POST or None)
 
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            messages.success(request, 'Record added successfully')
-            return redirect('website:add_record')
+            messages.success(request, 'Customer added successfully')
+            return redirect('website:add_customer')
         
         else:
             messages.error(request, 'Form is not valid. Check your inputs')
         
-    return render(request, 'website/add_record.html', {'form': form})
+    return render(request, 'website/add_customer.html', {'form': form})
 
 @login_required_w_message()
-def update_record(request, pk):
-    record_to_edit = Record.objects.get(id=pk)
-    form = AddRecordForm(request.POST or None, instance=record_to_edit)
+def update_customer(request, pk):
+    customer_to_update = Customer.objects.get(id=pk)
+    form = AddCustomerForm(request.POST or None, instance=customer_to_update)
 
     if request.method == 'POST':
         if form.is_valid():
             form.save(commit=True)
-            messages.success(request, f'Record #{record_to_edit.pk} edited successfully')
+            messages.success(request, f'Customer #{customer_to_update.pk} edited successfully')
             return redirect('website:home')
         
         else:
             messages.error(request, 'Error during editing. Check your form')
         
-    return render(request, 'website/update_record.html', {'form': form})
+    return render(request, 'website/update_customer.html', {'form': form})
     

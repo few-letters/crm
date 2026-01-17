@@ -9,6 +9,7 @@
         <tr>
           <th scope="col">#id</th>
           <th scope="col">Created at</th>
+          <th scope="col">Updated at</th>
           <th scope="col">First name</th>
           <th scope="col">Last name</th>
           <th scope="col">Phone</th>
@@ -18,19 +19,20 @@
         </tr>
       </thead>
       <tbody>
-        {% if records %}
-          {% for record in records %}
+        {% if customers %}
+          {% for customer in customers %}
             <tr>
               <th scope="row">
-                <a href="{% url "website:record" pk=record.id %}">{{ record.id }}</a>
+                <a href="{% url "website:customer_detail" pk=customer.id %}">{{ customer.id }}</a>
               </th>
-              <td>{{ record.created_at }}</td>
-              <td>{{ record.first_name }}</td>
-              <td>{{ record.last_name }}</td>
-              <td>{{ record.phone }}</td>
-              <td>{{ record.email }}</td>
-              <td>{{ record.state }}</td>
-              <td>{{ record.city }}</td>
+              <td>{{ customer.created_at }}</td>
+              <td>{{ customer.updated_at }}</td>
+              <td>{{ customer.first_name }}</td>
+              <td>{{ customer.last_name }}</td>
+              <td>{{ customer.phone }}</td>
+              <td>{{ customer.email }}</td>
+              <td>{{ customer.state }}</td>
+              <td>{{ customer.city }}</td>
             </tr>
           {% endfor %}
         {% endif %}

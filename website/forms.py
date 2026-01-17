@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.utils.html import format_html
-from .models import Record
+from .models import Customer
 
 
 User = get_user_model()
@@ -34,9 +34,9 @@ class SignUpForm(UserCreationForm):
             field.widget.attrs.setdefault("class", "form-control")
 
 
-class AddRecordForm(forms.ModelForm):
+class AddCustomerForm(forms.ModelForm):
     class Meta:
-            model = Record
+            model = Customer
 
             fields = ("first_name", "last_name", "email", "phone", "state", "city")
 

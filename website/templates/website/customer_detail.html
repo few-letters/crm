@@ -1,34 +1,35 @@
 {% extends "website/base.html" %}
 {% block content %}
     <div class="row justify-content-center mt-3">
-        <div class="card col-11 col-md-7 col-lg-5" id="record_card">
-            <h5 class="card-header bg-white">
-                {{ customer_record.first_name }} {{ customer_record.last_name }}
-            </h5>
+        <div class="card col-11 col-md-7 col-lg-5">
+            <h5 class="card-header bg-white">{{ customer.first_name }} {{ customer.last_name }}</h5>
 
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <strong>ID:</strong> {{ customer_record.pk }}
+                    <strong>ID:</strong> {{ customer.pk }}
                 </li>
                 <li class="list-group-item">
-                    <strong>Created:</strong> {{ customer_record.created_at }}
+                    <strong>Created:</strong> {{ customer.created_at }}
                 </li>
                 <li class="list-group-item">
-                    <strong>Email:</strong> {{ customer_record.email }}
+                    <strong>Last time updated:</strong> {{ customer.updated_at }}
                 </li>
                 <li class="list-group-item">
-                    <strong>Phone:</strong> {{ customer_record.phone }}
+                    <strong>Email:</strong> {{ customer.email }}
                 </li>
                 <li class="list-group-item">
-                    <strong>Location:</strong> {{ customer_record.city }}, {{ customer_record.state }}
+                    <strong>Phone:</strong> {{ customer.phone }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Location:</strong> {{ customer.city }}, {{ customer.state }}
                 </li>
             </ul>
 
             <div class="card-body">
                 <a href="{% url "website:home" %}" class="btn btn-primary me-1">Back</a>
-                <a href="{% url "website:update_record" pk=customer_record.id %}"
+                <a href="{% url "website:update_customer" pk=customer.id %}"
                    class="btn btn-success me-1">Edit</a>
-                <a href="{% url "website:delete_record" pk=customer_record.id %}"
+                <a href="{% url "website:delete_customer" pk=customer.id %}"
                    class="btn btn-danger">Delete</a>
             </div>
         </div>
