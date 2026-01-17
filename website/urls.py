@@ -1,4 +1,6 @@
 from django.urls import path, include
+from django.conf.urls.static import static
+from django.conf import settings
 from . import views
 
 app_name = 'website'
@@ -13,3 +15,6 @@ urlpatterns = [
     path('add_customer/', views.add_customer, name='add_customer'),
     #path('login/', views.login_user, name='login'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
