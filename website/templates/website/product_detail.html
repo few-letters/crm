@@ -1,0 +1,84 @@
+{% extends "website/base.html" %}
+{% block content %}
+    {% load static %}
+
+    <div class="row justify-content-center my-4">
+        <div class="col-md-8 col-lg-5">
+            <div class="card">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}"
+                         alt="product image"
+                         class="img-thumbnail card-img-top"
+                         style="max-height: 200px;
+                                width: auto;
+                                object-fit: contain">
+                {% else %}
+                    <img src="{% static 'img/placeholder.webp' %}"
+                         alt="product image"
+                         class="img-thumbnail card-img-top"
+                         style="max-height: 200px">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-header">Product: {{ product.name }}</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>ID:</strong> {{ product.id }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Created:</strong> {{ product.created_at }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Updated:</strong> {{ product.updated_at }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </br>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <br />
+            <div class="d-flex justify-content-between">
+                <div>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <a href="{% url 'website:product_list' %}" class="btn btn-secondary">Back</a>
+                </div>
+                <button type="button"
+                        class="btn btn-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal">Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade"
+     id="deleteModal"
+     tabindex="-1"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Confirm delete</h1>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Are you sure you want to delete tihs product?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <form action="{% url 'website:delete_product' pk=product.id %}"
+                      method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

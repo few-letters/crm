@@ -21,18 +21,24 @@ body {
   --bs-btn-disabled-border-color: #0f766e; /* border when disabled */
 }
 
-/* navbar */
-.navbar.custom-bg-body-grey-1 {
-  --bs-bg-opacity: 1;
-  background-color: #d2e3f0;
-}
-
 .bg-light-blue {
   background-color: #deecfa;
 }
 
 .border-radius-14 {
   border-radius: 14px;
+}
+
+.table-mobile-nowrap th,
+.table-mobile-nowrap td {
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .table-mobile-nowrap th,
+  .table-mobile-nowrap td {
+    white-space: normal;
+  }
 }
 
 /* registration form text */

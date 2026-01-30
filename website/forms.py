@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.utils.html import format_html
-from .models import Customer
+from .models import Customer, Product
 
 
 User = get_user_model()
@@ -38,13 +38,35 @@ class AddCustomerForm(forms.ModelForm):
     class Meta:
             model = Customer
 
-            fields = ("first_name", "last_name", "email", "phone", "state", "city")
+            fields = ("first_name", "last_name", "email", "phone", "country", "region", "city", "address")
 
             widgets = {
             "first_name": forms.TextInput(attrs={"placeholder": "First name", "class": "form-control"}),
             "last_name": forms.TextInput(attrs={"placeholder": "Last name", "class": "form-control"}),
             "email": forms.EmailInput(attrs={"placeholder": "Email address", "class": "form-control"}),
             "phone": forms.TextInput(attrs={"placeholder": "Phone", "class": "form-control"}),
-            "state": forms.TextInput(attrs={"placeholder": "State", "class": "form-control"}),
+            "country": forms.TextInput(attrs={"placeholder": "Country", "class": "form-control"}),
+            "region": forms.TextInput(attrs={"placeholder": "Region", "class": "form-control"}),
             "city": forms.TextInput(attrs={"placeholder": "City", "class": "form-control"}),
+            "address": forms.TextInput(attrs={"placeholder": "Address", "class": "form-control"}),
+        }
+
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'price', 'description', 'image']
+
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Product Name'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Price', 'step': '1'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Description', 'rows': 4}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+
+        labels = {
+            'name': 'Name',
+            'price': 'Price (₴)',
+            'description': 'Description',
+            'image': 'Product Image',
         }
