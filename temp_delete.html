@@ -1,0 +1,221 @@
+{% extends "website/base.html" %} {% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-lg-10">
+    <div class="card shadow-sm">
+      <div
+        class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+      >
+        <h3 class="mb-0">Create New Order</h3>
+      </div>
+      <div class="card-body">
+        <form method="post" id="order-form">
+          {% csrf_token %}
+
+          <h5 class="mb-3 text-secondary border-bottom pb-2">Customer Info</h5>
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Customer</label>
+              {{ form.customer }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Status</label>
+              {{ form.status }}
+            </div>
+          </div>
+
+          <h5 class="mb-3 text-secondary border-bottom pb-2">Order Items</h5>
+
+          {{ formset.management_form }}
+
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 45%">Product</th>
+                  <th style="width: 15%">Quantity</th>
+                  <th style="width: 20%">Price (₴)</th>
+                  <th style="width: 5%" class="text-center">Action</th>
+                </tr>
+              </thead>
+
+              <tbody id="items-table-body">
+                {% for item_form in formset %}
+                <tr class="item-row">
+                  {% for hidden in item_form.hidden_fields %} {{ hidden }} {%
+                  endfor %}
+
+                  <td>
+                    {% if item_form.product.errors %}
+                    <div class="text-danger small">
+                      {{ item_form.product.errors }}
+                    </div>
+                    {% endif %} {{ item_form.product }}
+                  </td>
+                  <td>
+                    {{ item_form.quantity }} {% if item_form.quantity.errors %}
+                    <div class="text-danger small">
+                      {{ item_form.quantity.errors }}
+                    </div>
+                    {% endif %}
+                  </td>
+                  <td>{{ item_form.price }}</td>
+                  <td class="text-center">
+                    <div class="d-none">{{ item_form.DELETE }}</div>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger delete-row-btn"
+                      title="Remove item"
+                    >
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mb-4">
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              id="add-item-btn"
+            >
+              <i class="fa-solid fa-plus"></i> Add another product
+            </button>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 border-top pt-3">
+            <a href="{% url 'website:order_list' %}" class="btn btn-secondary"
+              >Cancel</a
+            >
+            <button type="submit" class="btn btn-success px-4">
+              Save Order
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="empty-form" class="d-none">
+  <table>
+    <tr class="item-row">
+      {% for hidden in formset.empty_form.hidden_fields %} {{ hidden }} {%
+      endfor %}
+      <td>{{ formset.empty_form.product }}</td>
+      <td>{{ formset.empty_form.quantity }}</td>
+      <td>{{ formset.empty_form.price }}</td>
+      <td class="text-center">
+        <div class="d-none">{{ formset.empty_form.DELETE }}</div>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-danger delete-row-btn"
+        >
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // 1. ФУНКЦІЯ: Увімкнути Select2 для елемента
+    // Нам треба винести це в функцію, бо ми будемо викликати її двічі:
+    // - При завантаженні сторінки (для існуючих полів)
+    // - При натисканні "Add Product" (для нових полів)
+    function initSelect2(element) {
+      // $ - це звернення до jQuery
+      $(element).select2({
+        theme: "classic", // Стиль теми
+        width: "100%",
+        placeholder: "Select an option",
+        allowClear: true,
+      });
+    }
+
+    // Запускаємо Select2 для всіх селектів, які вже є на сторінці
+    $("select").each(function () {
+      initSelect2(this);
+    });
+
+    // 2. ЗМІННІ ДЛЯ РОБОТИ З ФОРМСЕТОМ
+    const addItemBtn = document.getElementById("add-item-btn");
+    const tableBody = document.getElementById("items-table-body");
+    const totalFormsInput = document.querySelector(
+      'input[name$="-TOTAL_FORMS"]',
+    ); // Знаходимо input TOTAL_FORMS
+    const emptyFormTemplate = document
+      .getElementById("empty-form")
+      .querySelector("tr"); // Беремо еталонний рядок
+
+    // 3. ЛОГІКА ДОДАВАННЯ (ADD ROW)
+    addItemBtn.addEventListener("click", function () {
+      // Отримуємо поточну кількість форм (наприклад, 1)
+      const count = parseInt(totalFormsInput.value);
+
+      // Клонуємо еталонний рядок
+      const newRow = emptyFormTemplate.cloneNode(true);
+
+      // Магія Regex: замінюємо всі входження '__prefix__' на число (наприклад, '1')
+      // Було: name="items-__prefix__-product" -> Стало: name="items-1-product"
+      newRow.innerHTML = newRow.innerHTML.replace(/__prefix__/g, count);
+
+      // Вставляємо новий рядок в таблицю
+      tableBody.appendChild(newRow);
+
+      // ВАЖЛИВО: Новий рядок вставився як звичайний HTML.
+      // Select2 на ньому ще не працює. Треба запустити його вручну для нового селекта.
+      const newSelect = newRow.querySelector("select");
+      if (newSelect) initSelect2(newSelect);
+
+      // Оновлюємо лічильник форм для Django (було 1 -> стало 2)
+      totalFormsInput.value = count + 1;
+    });
+
+    // 4. ЛОГІКА ВИДАЛЕННЯ (DELETE ROW)
+    // Ми вішаємо слухача подій на всю таблицю (Event Delegation),
+    // щоб це працювало і для кнопок, які ми додали динамічно.
+    tableBody.addEventListener("click", function (e) {
+      // Перевіряємо, чи клік був по кнопці видалення (або по іконці всередині неї)
+      const btn = e.target.closest(".delete-row-btn");
+      if (!btn) return;
+
+      const row = btn.closest("tr");
+
+      // Шукаємо прихований чекбокс видалення
+      const deleteCheckbox = row.querySelector(
+        'input[type="checkbox"][name$="-DELETE"]',
+      );
+
+      if (deleteCheckbox) {
+        // СЦЕНАРІЙ А: Це старий запис (вже є в базі).
+        // Ми не можемо його просто стерти з HTML, бо Django має отримати команду DELETE.
+        // Тому ми: 1. Ставимо галочку. 2. Ховаємо рядок від очей.
+        deleteCheckbox.checked = true;
+        row.style.display = "none";
+      } else {
+        // СЦЕНАРІЙ Б: Це новий рядок (ми його щойно додали кнопкою "+").
+        // Його немає в базі. Можна просто видалити з HTML.
+        row.remove();
+      }
+    });
+  });
+</script>
+
+<style>
+  .select2-container .select2-selection--single {
+    height: 38px !important;
+    border: 1px solid #dee2e6 !important; /* Сіра рамка як у Bootstrap */
+    display: flex;
+    align-items: center;
+  }
+  .select2-container--classic
+    .select2-selection--single
+    .select2-selection__arrow {
+    height: 36px !important;
+  }
+</style>
+{% endblock %}

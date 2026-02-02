@@ -1,8 +1,9 @@
 from django import forms
+from django.forms import inlineformset_factory
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.utils.html import format_html
-from .models import Customer, Product
+from .models import Customer, Product, OrderItem, Order
 
 
 User = get_user_model()
@@ -70,3 +71,30 @@ class ProductForm(forms.ModelForm):
             'description': 'Description',
             'image': 'Product Image',
         }
+
+
+class OrderForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ['customer', 'status']
+        
+        widgets = {
+            'customer': forms.Select(attrs={'class': 'form-select'}),
+            'status': forms.Select(attrs={'class': 'form-select status-select'}),
+        }
+
+
+OrderItemFormSet = inlineformset_factory(
+    parent_model=Order,
+    model=OrderItem,
+    fields=('product', 'quantity', 'price'),
+    widgets={
+        'product': forms.Select(attrs={'class': 'form-select'}), 
+        'quantity': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+        'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '1'}),
+    },
+    extra=0,
+    can_delete=True,
+    min_num=1,
+    validate_min=True
+)

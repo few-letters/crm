@@ -17,10 +17,10 @@
         <li class="nav-item">
           <a class="nav-link active"
              aria-current="page"
-             href="{% url "website:home" %}">Home (Customers)</a>
+             href="{% url "website:home" %}">Customers</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url "website:add_customer" %}">Orders</a>
+          <a class="nav-link" href="{% url "website:order_list" %}">Orders</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url "website:product_list" %}">Products</a>
@@ -33,7 +33,7 @@
              aria-expanded="false">Add new record</a>
           <ul class="dropdown-menu">
             <li>
-              <a class="dropdown-item" href="#">New customer order</a>
+              <a class="dropdown-item" href="#">Order for new customer</a>
             </li>
             <li>
               <hr class="dropdown-divider" />
@@ -42,7 +42,7 @@
               <a class="dropdown-item" href="{% url 'website:add_customer' %}">Add customer</a>
             </li>
             <li>
-              <a class="dropdown-item" href="#">Add order for existing customer</a>
+              <a class="dropdown-item" href="{% url "website:add_order" %}">Add order for existing customer</a>
             </li>
             <li>
               <a class="dropdown-item" href="{% url 'website:add_product' %}">Add product</a>
@@ -50,11 +50,6 @@
           </ul>
         </li>
       </ul>
-
-      {% comment %} <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form> {% endcomment %}
 
       {% if user.is_authenticated %}
         <a href="{% url 'website:logout' %}"

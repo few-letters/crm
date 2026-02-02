@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, AddCustomerForm, ProductForm
+from .forms import SignUpForm, AddCustomerForm, ProductForm, OrderForm, OrderItemFormSet
 from .models import Customer, Order, Product
 from core.decorators import login_required_w_message
 from django.db.models import Q
+from django.db import transaction
 
 
 def home(request):
@@ -158,14 +159,6 @@ def product_detail(request, pk):
 
 
 @login_required_w_message()
-def delete_customer(request, pk):
-    customer_to_delete = Customer.objects.get(id=pk)
-    customer_to_delete.delete()
-    messages.success(request, 'Customer deleted successfully')
-    return redirect('website:home')
-
-
-@login_required_w_message()
 def delete_product(request, pk):
     product = Product.objects.get(id=pk)
     
@@ -175,3 +168,48 @@ def delete_product(request, pk):
         return redirect('website:product_list')
         
     return redirect('website:product_list')
+
+
+@login_required_w_message()
+def order_list(request):
+    orders = Order.objects.select_related('customer').all().order_by('-updated_at')
+    search_query = request.GET.get('q')
+    
+    if search_query:
+        orders = orders.filter(
+            Q(id__icontains=search_query) | 
+            Q(customer__first_name__icontains=search_query) |
+            Q(customer__last_name__icontains=search_query) |
+            Q(customer__email__icontains=search_query) |
+            Q(customer__id__icontains=search_query)
+        )
+
+    return render(request, 'website/order_list.html', {'orders': orders})
+
+
+@login_required_w_message()
+def add_order(request):
+    if request.method == 'POST':
+        form = OrderForm(request.POST)
+        formset = OrderItemFormSet(request.POST)
+
+        if form.is_valid() and formset.is_valid():            
+            try:
+                with transaction.atomic():
+                    order = form.save()
+                    formset.instance = order
+                    formset.save()
+                    
+                messages.success(request, 'Order created successfully!')
+                return redirect('website:order_list')
+                
+            except Exception as e:
+                messages.error(request, f"Error creating order: {e}")
+        else:
+            messages.error(request, "Please correct the errors in form")
+            
+    else:
+        form = OrderForm()
+        formset = OrderItemFormSet()
+
+    return render(request, 'website/add_order.html', {'form': form, 'formset': formset})
