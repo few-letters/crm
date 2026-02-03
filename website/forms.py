@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.utils.html import format_html
 from .models import Customer, Product, OrderItem, Order
+from django_select2 import forms as s2forms
 
 
 User = get_user_model()
@@ -73,14 +74,29 @@ class ProductForm(forms.ModelForm):
         }
 
 
+class ProductWidget(s2forms.ModelSelect2Widget):
+    search_fields = [
+        "name__icontains", 
+        "description__icontains",
+    ]
+    attrs={"data-placeholder": "Select a product"}
+
+class CustomerWidget(s2forms.ModelSelect2Widget):
+    search_fields = [
+        "first_name__icontains",
+        "last_name__icontains",
+        "email__icontains",
+    ]
+    attrs={"data-placeholder": "Select a customer"}
+
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ['customer', 'status']
         
         widgets = {
-            'customer': forms.Select(attrs={'class': 'form-select'}),
-            'status': forms.Select(attrs={'class': 'form-select status-select'}),
+            'customer': CustomerWidget,
+            'status': s2forms.Select2Widget,
         }
 
 
@@ -89,9 +105,9 @@ OrderItemFormSet = inlineformset_factory(
     model=OrderItem,
     fields=('product', 'quantity', 'price'),
     widgets={
-        'product': forms.Select(attrs={'class': 'form-select'}), 
+        'product': ProductWidget, 
         'quantity': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
-        'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '1'}),
+        'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '1', 'placeholder': 'Auto'}),
     },
     extra=0,
     can_delete=True,

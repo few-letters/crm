@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'django_select2',
     'website',
 ]
 
@@ -59,6 +60,23 @@ MIDDLEWARE = [
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        # Адреса твого контейнера:
+        # redis:// -> протокол
+        # 127.0.0.1:6379 -> хост і порт (які ми прокинули в Docker)
+        # /1 -> номер бази даних (Redis має слоти від 0 до 15, зазвичай 0 для сесій, 1 для кешу)
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+SELECT2_CACHE_BACKEND = "default"
 
 ROOT_URLCONF = 'core.urls'
 

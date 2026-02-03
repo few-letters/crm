@@ -1,5 +1,14 @@
 {% extends "website/base.html" %}
 
+{% block extra_css %}
+   {{ form.media.css }}
+   <style>
+      .select2-container {
+         width: 100% !important;
+      }
+   </style>
+{% endblock extra_css %}
+
 {% block content %}
    <div class="row justify-content-center mt-4">
       <div class="col-lg-10">
@@ -9,16 +18,24 @@
             </div>
             <div class="card-body">
 
-               <form method="post">
+               <form method="post" novalidate>
                   {% csrf_token %}
 
                   <h5 class="mb-3">Order Info</h5>
                   <div class="row mb-4">
                      <div class="col-md-6">
                         <label class="form-label">Customer</label>
+                        {% if form.customer.errors %}
+                           <div class="text-danger small mt-1">{{ form.customer.errors }}</div>
+                        {% endif %}
+
                         {{ form.customer }}
                      </div>
                      <div class="col-md-6">
+                        {% if form.status.errors %}
+                           <div class="text-danger small mt-1">{{ form.status.errors }}</div>
+                        {% endif %}
+
                         <label class="form-label">Status</label>
                         {{ form.status }}
                      </div>
@@ -119,78 +136,51 @@
       </table>
    </div>
 
+{% endblock content %}
+
+{% block extra_js %}
+
+   {{ form.media.js }}
+
    <script>
-  document.addEventListener("DOMContentLoaded", function () {
+      document.addEventListener("DOMContentLoaded", function () {
 
-      function initSelect2(element) {
-         $(element).select2({
-         theme: "classic",
-         width: "100%",
-         placeholder: "Select an option",
-         allowClear: true,
-         });
-      }
-
-      $('select')
-         .not('.status-select')
-         .not('#empty-form select')
-         .each(function() {
-        initSelect2(this);
-    });
-
-      const addItemBtn = document.getElementById("add-item-btn");
-      const tableBody = document.getElementById("items-table-body");
-      const totalFormsInput = document.querySelector('input[name$="-TOTAL_FORMS"]',);
-      const emptyFormTemplate = document
+         const addItemBtn = document.getElementById("add-item-btn");
+         const tableBody = document.getElementById("items-table-body");
+         const totalFormsInput = document.querySelector('input[name$="-TOTAL_FORMS"]',);
+         const emptyFormTemplate = document
          .getElementById("empty-form")
          .querySelector("tr");
 
-      addItemBtn.addEventListener("click", function () {
-         const count = parseInt(totalFormsInput.value);
+         addItemBtn.addEventListener("click", function () {
+            const count = parseInt(totalFormsInput.value);
+            const newRow = emptyFormTemplate.cloneNode(true);
 
-         const newRow = emptyFormTemplate.cloneNode(true);
+            newRow.innerHTML = newRow.innerHTML.replace(/__prefix__/g, count); //g - флажок "для всього, не тільки перший"
+            tableBody.appendChild(newRow);
 
-         newRow.innerHTML = newRow.innerHTML.replace(/__prefix__/g, count); //g - флажок "для всього, не тільки перший"
+            const newSelect = newRow.querySelector("select");
+            if (newSelect) $(newSelect).djangoSelect2();
 
-         tableBody.appendChild(newRow);
+            totalFormsInput.value = count + 1;
+         });
 
-         const newSelect = newRow.querySelector("select");
-         if (newSelect) initSelect2(newSelect);
+         tableBody.addEventListener("click", function (e) {
+            const btn = e.target.closest(".delete-row-btn");
+            if (!btn) return;
 
-         totalFormsInput.value = count + 1;
+            const row = btn.closest("tr");
+            const deleteCheckbox = row.querySelector(
+            'input[type="checkbox"][name$="-DELETE"]',
+            );
+
+            if (deleteCheckbox) {
+            deleteCheckbox.checked = true;
+            row.style.display = "none";
+            } else {
+            row.remove();
+            }
+         });
       });
-
-      tableBody.addEventListener("click", function (e) {
-         const btn = e.target.closest(".delete-row-btn");
-         if (!btn) return;
-
-         const row = btn.closest("tr");
-         const deleteCheckbox = row.querySelector(
-         'input[type="checkbox"][name$="-DELETE"]',
-         );
-
-         if (deleteCheckbox) {
-         deleteCheckbox.checked = true;
-         row.style.display = "none";
-         } else {
-         row.remove();
-         }
-      });
-   });
    </script>
-
-   <style>
-  .select2-container .select2-selection--single {
-    height: 38px !important;
-    border: 1px solid #dee2e6 !important; /* Сіра рамка як у Bootstrap */
-    display: flex;
-    align-items: center;
-  }
-  .select2-container--classic
-    .select2-selection--single
-    .select2-selection__arrow {
-    height: 36px !important;
-  }
-   </style>
-
-{% endblock content %}
+{% endblock extra_js %}

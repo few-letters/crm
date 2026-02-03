@@ -1,4 +1,5 @@
-{% extends "website/base.html" %} {% block content %}
+{% extends "website/base.html" %} {% block content %} {{ form.media.css }}
+
 <div class="row justify-content-center mt-4">
   <div class="col-lg-10">
     <div class="card shadow-sm">
@@ -25,7 +26,11 @@
 
           <h5 class="mb-3 text-secondary border-bottom pb-2">Order Items</h5>
 
-          {{ formset.management_form }}
+          {% if formset.non_form_errors %}
+          <div class="alert alert-danger">
+            {% for error in formset.non_form_errors %} {{ error }} {% endfor %}
+          </div>
+          {% endif %} {{ formset.management_form }}
 
           <div class="table-responsive">
             <table class="table table-bordered align-middle">
@@ -37,7 +42,6 @@
                   <th style="width: 5%" class="text-center">Action</th>
                 </tr>
               </thead>
-
               <tbody id="items-table-body">
                 {% for item_form in formset %}
                 <tr class="item-row">
@@ -120,102 +124,60 @@
   </table>
 </div>
 
+{{ form.media.js }}
+
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    // 1. ФУНКЦІЯ: Увімкнути Select2 для елемента
-    // Нам треба винести це в функцію, бо ми будемо викликати її двічі:
-    // - При завантаженні сторінки (для існуючих полів)
-    // - При натисканні "Add Product" (для нових полів)
-    function initSelect2(element) {
-      // $ - це звернення до jQuery
-      $(element).select2({
-        theme: "classic", // Стиль теми
-        width: "100%",
-        placeholder: "Select an option",
-        allowClear: true,
-      });
-    }
+    // Більше не треба initSelect2() і $('select').each(...)
+    // Django-select2 робить це сам при завантаженні сторінки!
 
-    // Запускаємо Select2 для всіх селектів, які вже є на сторінці
-    $("select").each(function () {
-      initSelect2(this);
-    });
-
-    // 2. ЗМІННІ ДЛЯ РОБОТИ З ФОРМСЕТОМ
     const addItemBtn = document.getElementById("add-item-btn");
     const tableBody = document.getElementById("items-table-body");
     const totalFormsInput = document.querySelector(
       'input[name$="-TOTAL_FORMS"]',
-    ); // Знаходимо input TOTAL_FORMS
+    );
     const emptyFormTemplate = document
       .getElementById("empty-form")
-      .querySelector("tr"); // Беремо еталонний рядок
+      .querySelector("tr");
 
-    // 3. ЛОГІКА ДОДАВАННЯ (ADD ROW)
+    // ADD ROW LOGIC
     addItemBtn.addEventListener("click", function () {
-      // Отримуємо поточну кількість форм (наприклад, 1)
       const count = parseInt(totalFormsInput.value);
-
-      // Клонуємо еталонний рядок
       const newRow = emptyFormTemplate.cloneNode(true);
 
-      // Магія Regex: замінюємо всі входження '__prefix__' на число (наприклад, '1')
-      // Було: name="items-__prefix__-product" -> Стало: name="items-1-product"
       newRow.innerHTML = newRow.innerHTML.replace(/__prefix__/g, count);
-
-      // Вставляємо новий рядок в таблицю
       tableBody.appendChild(newRow);
 
-      // ВАЖЛИВО: Новий рядок вставився як звичайний HTML.
-      // Select2 на ньому ще не працює. Треба запустити його вручну для нового селекта.
+      // === ВАЖЛИВА ЗМІНА ===
+      // Новий рядок з'явився динамічно, тому авто-скрипт Django його не бачив.
+      // Ми маємо вручну "пнути" бібліотеку, щоб вона оживила цей конкретний селект.
       const newSelect = newRow.querySelector("select");
-      if (newSelect) initSelect2(newSelect);
+      if (newSelect) {
+        // Використовуємо вбудовану функцію плагіна.
+        // Вона прочитає data-атрибути з HTML (які згенерував Python) і все налаштує.
+        $(newSelect).djangoSelect2();
+      }
 
-      // Оновлюємо лічильник форм для Django (було 1 -> стало 2)
       totalFormsInput.value = count + 1;
     });
 
-    // 4. ЛОГІКА ВИДАЛЕННЯ (DELETE ROW)
-    // Ми вішаємо слухача подій на всю таблицю (Event Delegation),
-    // щоб це працювало і для кнопок, які ми додали динамічно.
+    // DELETE ROW LOGIC (Без змін)
     tableBody.addEventListener("click", function (e) {
-      // Перевіряємо, чи клік був по кнопці видалення (або по іконці всередині неї)
       const btn = e.target.closest(".delete-row-btn");
       if (!btn) return;
 
       const row = btn.closest("tr");
-
-      // Шукаємо прихований чекбокс видалення
       const deleteCheckbox = row.querySelector(
         'input[type="checkbox"][name$="-DELETE"]',
       );
 
       if (deleteCheckbox) {
-        // СЦЕНАРІЙ А: Це старий запис (вже є в базі).
-        // Ми не можемо його просто стерти з HTML, бо Django має отримати команду DELETE.
-        // Тому ми: 1. Ставимо галочку. 2. Ховаємо рядок від очей.
         deleteCheckbox.checked = true;
         row.style.display = "none";
       } else {
-        // СЦЕНАРІЙ Б: Це новий рядок (ми його щойно додали кнопкою "+").
-        // Його немає в базі. Можна просто видалити з HTML.
         row.remove();
       }
     });
   });
 </script>
-
-<style>
-  .select2-container .select2-selection--single {
-    height: 38px !important;
-    border: 1px solid #dee2e6 !important; /* Сіра рамка як у Bootstrap */
-    display: flex;
-    align-items: center;
-  }
-  .select2-container--classic
-    .select2-selection--single
-    .select2-selection__arrow {
-    height: 36px !important;
-  }
-</style>
 {% endblock %}
