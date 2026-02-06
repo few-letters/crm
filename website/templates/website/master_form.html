@@ -1,0 +1,172 @@
+{% extends "website/base.html" %}
+
+{% block extra_css %}
+    {{ form.media.css }}
+    <style>
+      .select2-container {
+         width: 100% !important;
+      }
+    </style>
+{% endblock extra_css %}
+
+{% block content %}
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="fa-regular fa-address-card"></i> Master form: New Client + Order
+                    </h3>
+                </div>
+                <div class="card-body">
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="p-3 mb-4 bg-light rounded border">
+                            <h5 class="text-success border-bottom pb-2">1. New Customer Details</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">First Name</label>
+                                    {{ customer_form.first_name }}
+                                    <div class="text-danger small">{{ customer_form.first_name.errors }}</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Last Name</label>
+                                    {{ customer_form.last_name }}
+                                    <div class="text-danger small">{{ customer_form.last_name.errors }}</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email</label>
+                                    {{ customer_form.email }}
+                                    <div class="text-danger small">{{ customer_form.email.errors }}</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Phone</label>
+                                    {{ customer_form.phone }}
+                                    <div class="text-danger small">{{ customer_form.phone.errors }}</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Country</label>
+                                    {{ customer_form.country }}
+                                    <div class="text-danger small">{{ customer_form.country.errors }}</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Region</label>
+                                    {{ customer_form.region }}
+                                    <div class="text-danger small">{{ customer_form.region.errors }}</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">City</label>
+                                    {{ customer_form.city }}
+                                    <div class="text-danger small">{{ customer_form.city.errors }}</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Address</label>
+                                    {{ customer_form.address }}
+                                    <div class="text-danger small">{{ customer_form.address.errors }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-3 mb-4 bg-white rounded border">
+                            <h5 class="text-primary border-bottom pb-2">2. Order Settings</h5>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label class="form-label">Order Status</label>
+                                    {{ order_form.status }}
+                                    <div class="text-danger small">{{ order_form.status.errors }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3">3. Products</h5>
+                        {{ formset.management_form }}
+
+                        {% if formset.non_form_errors %}
+                            <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+                        {% endif %}
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50%">Product</th>
+                                        <th style="width: 20%">Quantity</th>
+                                        <th style="width: 20%">Price</th>
+                                        <th style="width: 10%">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="items-table-body">
+                                    {% for item_form in formset %}
+                                        <tr class="item-row">
+                                            {% for hidden in item_form.hidden_fields %}{{ hidden }}{% endfor %}
+                                            <td>
+                                                {{ item_form.product }}
+                                                <div class="text-danger small">{{ item_form.product.errors }}</div>
+                                            </td>
+                                            <td>
+                                                {{ item_form.quantity }}
+                                                <div class="text-danger small">{{ item_form.quantity.errors }}</div>
+                                            </td>
+                                            <td>
+                                                {{ item_form.price }}
+                                                <div class="text-danger small">{{ item_form.price.errors }}</div>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="d-none">{{ item_form.DELETE }}</div>
+                                                <button type="button" class="btn btn-sm btn-outline-danger delete-row-btn">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mb-4">
+                            <button type="button" class="btn btn-outline-primary" id="add-item-btn">
+                                <i class="fa-solid fa-plus"></i> Add Product
+                            </button>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'website:order_list' %}"
+                               class="btn btn-secondary btn-lg">Cancel</a>
+                            <button type="submit" class="btn btn-success btn-lg">Submit</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="empty-form" class="d-none">
+        <table>
+            <tr class="item-row">
+                {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+                <td>{{ formset.empty_form.product }}</td>
+                <td>{{ formset.empty_form.quantity }}</td>
+                <td>{{ formset.empty_form.price }}</td>
+                <td class="text-center align-middle">
+                    <div class="d-none">{{ formset.empty_form.DELETE }}</div>
+                    <button type="button" class="btn btn-sm btn-outline-danger delete-row-btn">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+{% endblock content %}
+
+{% block extra_js %}
+
+    {{ order_form.media.js }}
+
+    {% include "website/select2_script.html" %}
+
+{% endblock extra_js %}

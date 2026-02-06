@@ -1,7 +1,7 @@
 {% extends "website/base.html" %}
 {% block content %}
 
-    <div class="row justify-content-center my-4">
+    <div class="row justify-content-center my-3">
         <div class="col-12">
             <h1 class="mt-3 text-center">Orders</h1>
         </div>
@@ -42,11 +42,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% if orders %}
-                            {% for order in orders %}
+                        {% if orders_page %}
+                            {% for order in orders_page %}
                                 <tr class="align-middle">
                                     <th scope="row">
-                                        <a href="">{{ order.id }}</a>
+                                        <a href="{% url "website:order_detail" pk=order.id %}">{{ order.id }}</a>
                                     </th>
                                     <td>{{ order.created_at|date:"d.m.y H:i" }}</td>
                                     <td>{{ order.updated_at|date:"d.m.y H:i" }}</td>
@@ -63,7 +63,7 @@
                                     </td>
                                     <td>{{ order.get_total_cost }}</td>
                                     <td>
-                                        <a href="">{{ order.customer.id }}</a>
+                                        <a href="{% url "website:customer_detail" pk=order.customer.id %}">{{ order.customer.id }}</a>
                                     </td>
                                     <td>{{ order.customer.first_name }} {{ order.customer.last_name }}</td>
                                     <td>{{ order.customer.email }}</td>
@@ -74,6 +74,51 @@
                 </table>
             </div>
         </div>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        {% if orders_page.has_other_pages %}
+            <nav aria-label="Order navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+
+                    {% if orders_page.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?page={{ orders_page.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Previous</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    {% endif %}
+
+                    {% for i in orders_page.paginator.page_range %}
+                        {% if orders_page.number == i %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ i }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ i }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if orders_page.has_next %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?page={{ orders_page.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Next</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+        {% endif %}
     </div>
 
 {% endblock content %}

@@ -33,19 +33,19 @@
              aria-expanded="false">Add new record</a>
           <ul class="dropdown-menu">
             <li>
-              <a class="dropdown-item" href="#">Order for new customer</a>
+              <a class="dropdown-item" href="{% url "website:master_form" %}">Master form: Order for new Customer</a>
             </li>
             <li>
               <hr class="dropdown-divider" />
             </li>
             <li>
-              <a class="dropdown-item" href="{% url 'website:add_customer' %}">Add customer</a>
+              <a class="dropdown-item" href="{% url 'website:add_customer' %}">Add Customer</a>
             </li>
             <li>
-              <a class="dropdown-item" href="{% url "website:add_order" %}">Add order for existing customer</a>
+              <a class="dropdown-item" href="{% url "website:add_order" %}">Add Order for existing Customer</a>
             </li>
             <li>
-              <a class="dropdown-item" href="{% url 'website:add_product' %}">Add product</a>
+              <a class="dropdown-item" href="{% url 'website:add_product' %}">Add Product</a>
             </li>
           </ul>
         </li>

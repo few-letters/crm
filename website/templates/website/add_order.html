@@ -69,24 +69,24 @@
                                  {% for hidden in item_form.hidden_fields %}{{ hidden }}{% endfor %}
 
                                  <td>
+                                    {{ item_form.product }}
                                     {% if item_form.product.errors %}
                                        <div class="text-danger small">{{ item_form.product.errors }}</div>
                                     {% endif %}
-                                    {{ item_form.product }}
                                  </td>
 
                                  <td>
+                                    {{ item_form.quantity }}
                                     {% if item_form.quantity.errors %}
                                        <div class="text-danger small">{{ item_form.quantity.errors }}</div>
                                     {% endif %}
-                                    {{ item_form.quantity }}
                                  </td>
 
                                  <td>
+                                    {{ item_form.price }}
                                     {% if item_form.price.errors %}
                                        <div class="text-danger small">{{ item_form.price.errors }}</div>
                                     {% endif %}
-                                    {{ item_form.price }}
                                  </td>
 
                                  <td class="text-center align-middle">

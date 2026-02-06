@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import SignUpForm, AddCustomerForm, ProductForm, OrderForm, OrderItemFormSet
@@ -6,6 +6,7 @@ from .models import Customer, Order, Product
 from core.decorators import login_required_w_message
 from django.db.models import Q
 from django.db import transaction
+from django.core.paginator import Paginator
 
 
 def home(request):
@@ -18,6 +19,10 @@ def home(request):
             Q(last_name__icontains=search_query) |
             Q(email__icontains=search_query)
     )
+        
+    paginator = Paginator(customers, 8)
+    page_num = request.GET.get('page')
+    page_obj = paginator.get_page(page_num)
 
     if request.method == 'POST':
 
@@ -34,7 +39,7 @@ def home(request):
                 return redirect('website:home')
 
     else:
-        return render(request, 'website/home.html', {'customers': customers})
+        return render(request, 'website/home.html', {'customers_page': page_obj})
 
 
 def logout_user(request):
@@ -120,7 +125,11 @@ def product_list(request):
             Q(description__icontains=search_query)  #Не оптимально для highload. Потім почитати про SearchVector
     )
         
-    return render(request, 'website/product_list.html', {'products': products})
+    paginator = Paginator(products, 4)
+    page_num = request.GET.get('page')
+    page_obj = paginator.get_page(page_num)
+        
+    return render(request, 'website/product_list.html', {'products_page': page_obj})
 
 
 @login_required_w_message()
@@ -184,7 +193,12 @@ def order_list(request):
             Q(customer__id__icontains=search_query)
         )
 
-    return render(request, 'website/order_list.html', {'orders': orders})
+    paginator = Paginator(orders, 7)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+
+    return render(request, 'website/order_list.html', {'orders_page': page_obj})
 
 
 @login_required_w_message()
@@ -213,3 +227,97 @@ def add_order(request):
         formset = OrderItemFormSet()
 
     return render(request, 'website/add_order.html', {'form': form, 'formset': formset})
+
+
+@login_required_w_message()
+def order_detail(request, pk):
+    order = get_object_or_404(
+        Order.objects.select_related('customer').prefetch_related('items__product'),
+        id=pk
+    )
+    return render(request, 'website/order_detail.html', {'order': order})
+
+
+@login_required_w_message()
+def update_order(request, pk):
+    order = get_object_or_404(Order.objects.select_related('customer'), id=pk)
+
+    if request.method == 'POST':
+        form = OrderForm(request.POST, instance=order)
+        formset = OrderItemFormSet(request.POST, instance=order)
+
+        if form.is_valid() and formset.is_valid():
+            try:
+                with transaction.atomic():
+                    form.save()
+                    formset.save()
+
+                    messages.success(request, 'Order updated successfully')
+                    return redirect('website:order_detail', pk=order.id)
+                
+            except Exception as e:
+                messages.error(request, 'Error: {e}')
+
+        else:
+            messages.error(request, 'Check errors in form')
+        
+    else:
+        form = OrderForm(instance=order)
+        formset = OrderItemFormSet(instance=order)
+        
+    return render(request, 'website/update_order.html', {
+        'form': form,
+        'formset': formset,
+        'order': order
+    })          
+
+
+@login_required_w_message()
+def delete_order(request, pk):
+    order = get_object_or_404(Order, id=pk)
+    
+    if request.method == 'POST':
+        order.delete()
+        messages.success(request, f"Order #{pk} deleted successfully")
+        return redirect('website:order_list')
+    
+    return redirect('website:order_list')
+
+
+@login_required_w_message()
+def master_form(request):
+    if request.method == 'POST':
+        customer_form = AddCustomerForm(request.POST, prefix='customer')
+        order_form = OrderForm(request.POST, prefix='order')
+        formset = OrderItemFormSet(request.POST, prefix='items')    # по дефолту стояв би і так 'items', бо в моделі related_name='items', але робимо explicitly                                    
+        del order_form.fields['customer'] # щоб пройти валідацію не передавши користувача (він ще не створений)
+
+        if customer_form.is_valid() and order_form.is_valid() and formset.is_valid():
+            try:
+                with transaction.atomic():
+                    customer = customer_form.save()
+                    order = order_form.save(commit=False)
+                    order.customer = customer
+                    order.save()
+
+                    formset.instance = order
+                    formset.save()
+                    messages.success(request, f'Customer #{customer.id} and Order #{order.id} created successfully')
+                    return redirect('website:order_detail', pk=order.id)
+
+            except Exception as e:
+                messages.error(request, 'Error: {e}')
+        
+        else:
+            messages.error(request, 'Check errors in form')
+    
+    else:
+        customer_form = AddCustomerForm(prefix='customer')
+        order_form = OrderForm(prefix='order')
+        formset = OrderItemFormSet(prefix='items')
+
+    return render(request, 'website/master_form.html', {
+        'customer_form': customer_form,
+        'order_form': order_form,
+        'formset': formset
+    })

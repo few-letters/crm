@@ -1,0 +1,41 @@
+<script>
+      document.addEventListener("DOMContentLoaded", function () {
+
+         const addItemBtn = document.getElementById("add-item-btn");
+         const tableBody = document.getElementById("items-table-body");
+         const totalFormsInput = document.querySelector('input[name$="-TOTAL_FORMS"]',);
+         const emptyFormTemplate = document
+         .getElementById("empty-form")
+         .querySelector("tr");
+
+         addItemBtn.addEventListener("click", function () {
+            const count = parseInt(totalFormsInput.value);
+            const newRow = emptyFormTemplate.cloneNode(true);
+
+            newRow.innerHTML = newRow.innerHTML.replace(/__prefix__/g, count); //g - флажок "для всього, не тільки перший"
+            tableBody.appendChild(newRow);
+
+            const newSelect = newRow.querySelector("select");
+            if (newSelect) $(newSelect).djangoSelect2();
+
+            totalFormsInput.value = count + 1;
+         });
+
+         tableBody.addEventListener("click", function (e) {
+            const btn = e.target.closest(".delete-row-btn");
+            if (!btn) return;
+
+            const row = btn.closest("tr");
+            const deleteCheckbox = row.querySelector(
+            'input[type="checkbox"][name$="-DELETE"]',
+            );
+
+            if (deleteCheckbox) {
+            deleteCheckbox.checked = true;
+            row.style.display = "none";
+            } else {
+            row.remove();
+            }
+         });
+      });
+</script>

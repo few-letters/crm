@@ -1,0 +1,186 @@
+{% extends "website/base.html" %}
+
+{% block extra_css %}
+    {{ form.media.css }}
+    <style>
+      .select2-container {
+         width: 100% !important;
+      }
+    </style>
+{% endblock extra_css %}
+
+{% block content %}
+    <div class="row justify-content-center mt-4">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Edit Order #{{ order.id }}</h3>
+                </div>
+                <div class="card-body">
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <h5 class="mb-3">Order Info</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Customer</label>
+                                {% if form.customer.errors %}
+                                    <div class="text-danger small mt-1">{{ form.customer.errors }}</div>
+                                {% endif %}
+
+                                {{ form.customer }}
+                            </div>
+                            <div class="col-md-6">
+                                {% if form.status.errors %}
+                                    <div class="text-danger small mt-1">{{ form.status.errors }}</div>
+                                {% endif %}
+
+                                <label class="form-label">Status</label>
+                                {{ form.status }}
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <h5 class="mb-3">Order Items</h5>
+
+                        {{ formset.management_form }}
+
+                        {% if formset.non_form_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in formset.non_form_errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50%">Product</th>
+                                        <th style="width: 20%">Quantity</th>
+                                        <th style="width: 20%">Price</th>
+                                        <th style="width: 10%">Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="items-table-body">
+                                    {% for item_form in formset %}
+                                        <tr class="item-row">
+                                            {% for hidden in item_form.hidden_fields %}{{ hidden }}{% endfor %}
+
+                                            <td>
+                                                {{ item_form.product }}
+                                                {% if item_form.product.errors %}
+                                                    <div class="text-danger small">{{ item_form.product.errors }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            <td>
+                                                {{ item_form.quantity }}
+                                                {% if item_form.quantity.errors %}
+                                                    <div class="text-danger small">{{ item_form.quantity.errors }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            <td>
+                                                {{ item_form.price }}
+                                                {% if item_form.price.errors %}
+                                                    <div class="text-danger small">{{ item_form.price.errors }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            <td class="text-center align-middle">
+                                                <div class="d-none">{{ item_form.DELETE }}</div>
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-danger delete-row-btn"
+                                                        title="Remove item">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mb-4">
+                            <button type="button" class="btn btn-outline-primary" id="add-item-btn">
+                                <i class="fa-solid fa-plus"></i> Add another product
+                            </button>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'website:order_list' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success">Update Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="empty-form" class="d-none">
+        <table>
+            <tr class="item-row">
+                {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+                <td>{{ formset.empty_form.product }}</td>
+                <td>{{ formset.empty_form.quantity }}</td>
+                <td>{{ formset.empty_form.price }}</td>
+                <td class="text-center">
+                    <div class="d-none">{{ formset.empty_form.DELETE }}</div>
+                    <button type="button" class="btn btn-sm btn-outline-danger delete-row-btn">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+{% endblock content %}
+
+{% block extra_js %}
+
+    {{ form.media.js }}
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+
+         const addItemBtn = document.getElementById("add-item-btn");
+         const tableBody = document.getElementById("items-table-body");
+         const totalFormsInput = document.querySelector('input[name$="-TOTAL_FORMS"]',);
+         const emptyFormTemplate = document
+         .getElementById("empty-form")
+         .querySelector("tr");
+
+         addItemBtn.addEventListener("click", function () {
+            const count = parseInt(totalFormsInput.value);
+            const newRow = emptyFormTemplate.cloneNode(true);
+
+            newRow.innerHTML = newRow.innerHTML.replace(/__prefix__/g, count); //g - флажок "для всього, не тільки перший"
+            tableBody.appendChild(newRow);
+
+            const newSelect = newRow.querySelector("select");
+            if (newSelect) $(newSelect).djangoSelect2();
+
+            totalFormsInput.value = count + 1;
+         });
+
+         tableBody.addEventListener("click", function (e) {
+            const btn = e.target.closest(".delete-row-btn");
+            if (!btn) return;
+
+            const row = btn.closest("tr");
+            const deleteCheckbox = row.querySelector(
+            'input[type="checkbox"][name$="-DELETE"]',
+            );
+
+            if (deleteCheckbox) {
+            deleteCheckbox.checked = true;
+            row.style.display = "none";
+            } else {
+            row.remove();
+            }
+         });
+      });
+    </script>
+{% endblock extra_js %}

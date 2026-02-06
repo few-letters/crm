@@ -64,11 +64,7 @@ INTERNAL_IPS = [
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        # Адреса твого контейнера:
-        # redis:// -> протокол
-        # 127.0.0.1:6379 -> хост і порт (які ми прокинули в Docker)
-        # /1 -> номер бази даних (Redis має слоти від 0 до 15, зазвичай 0 для сесій, 1 для кешу)
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": env('REDIS_URL'),
         
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -163,3 +159,19 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+}
