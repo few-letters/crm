@@ -181,7 +181,7 @@ def delete_product(request, pk):
 
 @login_required_w_message()
 def order_list(request):
-    orders = Order.objects.select_related('customer').all().order_by('-updated_at')
+    orders = Order.objects.select_related('customer').prefetch_related('items').all().order_by('-updated_at')
     search_query = request.GET.get('q')
     
     if search_query:

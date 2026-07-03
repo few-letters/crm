@@ -1,3 +1,17 @@
+[project]
+name = "crm"
+version = "0.1.0"
+description = "uv python dependencies"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "django>=6.0.6",
+    "django-environ>=0.14.0",
+    "djlint>=1.40.1",
+    "pillow>=12.3.0",
+    "psycopg[binary]>=3.3.4",
+]
+
 [tool.djlint]
 profile = "django"
 preserve_blank_lines = true
