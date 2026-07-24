@@ -5,20 +5,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('website', '0008_product_order_orderitem'),
+        ("website", "0008_product_order_orderitem"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='orderitem',
-            name='order',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='items', to='website.order'),
+            model_name="orderitem",
+            name="order",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="items",
+                to="website.order",
+            ),
         ),
         migrations.AlterField(
-            model_name='orderitem',
-            name='price',
+            model_name="orderitem",
+            name="price",
             field=models.DecimalField(blank=True, decimal_places=2, max_digits=10),
         ),
     ]

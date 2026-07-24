@@ -1,15 +1,25 @@
 [project]
 name = "crm"
 version = "0.1.0"
-description = "uv python dependencies"
+description = "Django CRM pet-project"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "django>=6.0.6",
+    "django-debug-toolbar>=7.0.0",
     "django-environ>=0.14.0",
-    "djlint>=1.40.1",
+    "django-redis>=7.0.0",
+    "django-select2>=8.4.8",
     "pillow>=12.3.0",
     "psycopg[binary]>=3.3.4",
+]
+
+[dependency-groups]
+dev = [
+    "djlint>=1.42.1",
+    "faker>=40.32.0",
+    "pre-commit>=4.6.1",
+    "ruff>=0.15.22",
 ]
 
 [tool.djlint]
@@ -18,3 +28,9 @@ preserve_blank_lines = true
 max_blank_lines = 2
 ignore = "H030,H031,H014,H021,H006"
 max_line_length = 100
+
+[tool.ruff]
+extend-exclude = [
+    "*/migrations/*",
+    "staticfiles/",
+]
