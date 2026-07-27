@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+
 # Create your models here.
 class User(AbstractUser):
     """Custom user for future extensibility."""
@@ -27,14 +28,14 @@ class Customer(TimeStampedModel):
     address = models.CharField(max_length=90, blank=True)
 
     def __str__(self):
-        return(f"{self.first_name} {self.last_name}, email: {self.email}")
+        return f"{self.first_name} {self.last_name}, email: {self.email}"
 
 
 class Product(TimeStampedModel):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to='products/%Y/%m/', blank=True, null=True)
+    image = models.ImageField(upload_to="products/%Y/%m/", blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -42,16 +43,16 @@ class Product(TimeStampedModel):
 
 class Order(TimeStampedModel):
     class StatusChoices(models.TextChoices):
-        NEW = 'new', 'Нове'
-        IN_PROGRESS = 'in_progress', 'В обробці'
-        COMPLETED = 'completed', 'Виконано'
-        CANCELLED = 'cancelled', 'Скасовано'
+        NEW = "new", "Нове"
+        IN_PROGRESS = "in_progress", "В обробці"
+        COMPLETED = "completed", "Виконано"
+        CANCELLED = "cancelled", "Скасовано"
 
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='orders')
+    customer = models.ForeignKey(
+        Customer, on_delete=models.CASCADE, related_name="orders"
+    )
     status = models.CharField(
-        max_length=20, 
-        choices=StatusChoices.choices, 
-        default=StatusChoices.NEW
+        max_length=20, choices=StatusChoices.choices, default=StatusChoices.NEW
     )
 
     def __str__(self):
@@ -59,10 +60,10 @@ class Order(TimeStampedModel):
 
     def get_total_cost(self):
         return sum(item.get_cost() for item in self.items.all())
-    
+
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name='items')
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True)
@@ -72,9 +73,9 @@ class OrderItem(models.Model):
 
     def get_cost(self):
         return self.price * self.quantity
-    
+
     def save(self, *args, **kwargs):
         if not self.price:
             self.price = self.product.price
-        
+
         super().save(*args, **kwargs)
